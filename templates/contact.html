@@ -1,0 +1,27 @@
+<!--Contact Section-->
+
+<div class="resume-section-content">
+    <h2 class="mb-5">Contact Me</h2>
+<!--    {% with messages = get_flashed_messages() %}-->
+<!--    {% if messages %}-->
+<!--    {% for message in messages %}-->
+<!--    <h2 class="mb-5">{{ message }}</h2>-->
+<!--    {% endfor %}-->
+<!--    {% endif %}-->
+<!--    {% endwith %}-->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <script>
+      Swal.fire({
+        title: "Thank You!",
+        text: "{{ messages[0] }}", // Assuming you want to display the first message
+        icon: "success"
+      }).then((result) => {
+        // Reset the form here
+        document.getElementById('form').reset();
+      });
+    </script>
+    {% endif %}
+    {% endwith %}
+    {{render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+</div>
