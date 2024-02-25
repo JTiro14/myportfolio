@@ -1,4 +1,4 @@
-from flask import Flask, abort, render_template, redirect, url_for, flash
+from flask import Flask, abort, render_template, redirect, url_for, flash, session
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, EmailField, TextAreaField, SelectField
@@ -55,10 +55,12 @@ def home():
         except Exception as e:
             flash(f'An error occurred: {e}', 'error')
 
-        return redirect(url_for('home') + '#contact')
+        session['just_submitted'] = True
+        return redirect(url_for('home'))
 
         # The GET request and form validation failure case
-    return render_template("index.html", form=form)
+    just_submitted = session.pop('just_submitted', True)
+    return render_template("index.html", form=form, just_submitted=just_submitted)
 
 
 if __name__ == "__main__":
