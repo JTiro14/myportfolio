@@ -27,9 +27,9 @@ class MessageForm(FlaskForm):
     country_codes = [f"{data['name']} ({data['dial_code']})" for data in datas]
     name = StringField("Name", validators=[DataRequired()])
     email = EmailField("Email", validators=[DataRequired(), Email()])
-    country_code = SelectField('Country Code', choices=country_codes, render_kw={"class": "form-control col-md-4"})
-    phone = StringField('Phone', validators=[DataRequired(), Regexp(r'^\d{10}$', message='Invalid phone number')],
-                        render_kw={"class": "form-control col-md-4"})
+    # country_code = SelectField('Country Code', choices=country_codes, render_kw={"class": "form-control col-md-4"})
+    # phone = StringField('Phone', validators=[DataRequired(), Regexp(r'^\d{11}$', message='Invalid phone number.. should not start at 0 or +63')],
+    #                     render_kw={"class": "form-control col-md-4"})
     message = TextAreaField("Message", render_kw={"rows": 5, "cols": 11}, validators=[DataRequired()])
     submit = SubmitField("Send Me a Message!")
 
@@ -38,33 +38,27 @@ class MessageForm(FlaskForm):
 def home():
     form = MessageForm()
     if form.validate_on_submit():
-        with smtplib.SMTP("smtp.gmail.com", 587) as connection:
-            connection.starttls()
-            connection.login(user=MY_EMAIL, password=MY_PASSWORD)
-            country_code_parts = form.country_code.data.split('(', 1)
-            if len(country_code_parts) == 2:
-                country_code = country_code_parts[1].split(')', 1)[0]
-            else:
-                country_code = ''
-            connection.sendmail(
-                from_addr=MY_EMAIL,
-                to_addrs=MY_EMAIL,
-                msg=f"Subject: New Message From Portfolio\n\n"
-                    f"Name: {form.name.data.title()}\n"
-                    f"Email: {form.email.data.strip()}\n"
-                    f"Phone: {country_code}{form.phone.data}\n"
-                    f"Message: {form.message.data}"
-            )
-            form = MessageForm()
-            flash('Message Sent Successfully!')
-            return redirect(url_for('home') + '#contact')
-            # return redirect(url_for('home', form=form))
-            # # flash('Message Sent')
-            # # return redirect(url_for('home'))
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587) as connection:
+                connection.starttls()
+                connection.login(user=MY_EMAIL, password=MY_PASSWORD)
+                connection.sendmail(
+                    from_addr=MY_EMAIL,
+                    to_addrs=MY_EMAIL,
+                    msg=f"Subject: New Message From Portfolio\n\n"
+                        f"Name: {form.name.data.title()}\n"
+                        f"Email: {form.email.data.strip()}\n"
+                        # f"Phone: {country_code}{form.phone.data}\n" (Commented out as you did)
+                        f"Message: {form.message.data}"
+                )
+            flash('Your message has been sent successfully!', 'success')
+        except Exception as e:
+            flash(f'An error occurred: {e}', 'error')
 
-            # return render_template("index.html", form=form, message='Message Sent Successfully!')
+        return redirect(url_for('home') + '#contact')
+
+        # The GET request and form validation failure case
     return render_template("index.html", form=form)
-
 
 if __name__ == "__main__":
     app.run(debug=True, port=5009)
