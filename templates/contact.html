@@ -2,37 +2,26 @@
 
 <div class="resume-section-content">
     <h2 class="mb-5">Contact Me</h2>
-<!--    {% with messages = get_flashed_messages() %}-->
-<!--    {% if messages %}-->
-<!--    {% for message in messages %}-->
-<!--    <h2 class="mb-5">{{ message }}</h2>-->
-<!--    {% endfor %}-->
-<!--    {% endif %}-->
-<!--    {% endwith %}-->
+    {% if auto_click_contact %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Scroll to the contact section if there are form errors
+                document.getElementById('contactNavLink').click();
+            });
+        </script>
+    {% endif %}
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in get_flashed_messages(with_categories=True) %}
+            <script>
+                Swal.fire({
+                    title: "{{ 'Thank You For Messaging Me!' if category == 'success' else 'Error' }}",
+                    text: "{{ message }}",
+                    icon: "{{ 'success' if category == 'success' else 'error' }}"
+                });
+            </script>
+        {% endfor %}
+    {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=True) %}
-  {% for category, message in messages %}
-    <script>
-      console.log("Category:", "{{ category }}", "Message:", "{{ message }}");
-      Swal.fire({
-        title: "{{ 'Thank You!' if category == 'success' else 'Oops...' }}",
-        text: "{{ message }}",
-        icon: "{{ 'success' if category == 'success' else 'error' }}"
-      });
-    </script>
-  {% endfor %}
-{% endwith %}
-
-{{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-
-    {% if just_submitted %}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById('contactNavLink').click();
-    });
-</script>
-{% endif %}
-
-
+    {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
 </div>
