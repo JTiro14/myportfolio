@@ -1,4 +1,4 @@
-from flask import Flask, abort, render_template, redirect, url_for, flash, session, request
+from flask import Flask, abort, render_template, redirect, url_for, flash, session, request, send_file
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, EmailField, TextAreaField, SelectField
@@ -8,7 +8,6 @@ import datetime as dt
 import os
 import json
 from dotenv import load_dotenv, find_dotenv
-
 
 
 app = Flask(__name__)
@@ -63,6 +62,14 @@ def home():
     # Handle the GET request or redirect after POST
     auto_click_contact = session.pop('auto_click_contact', False)
     return render_template("index.html", form=form, auto_click_contact=auto_click_contact)
+
+
+@app.route("/download_cv")
+def download_cv():
+    # Specify the path to your CV file
+    cv_file_path = 'tirojulitoiii_cv.pdf'
+    # Return the file for download
+    return send_file(cv_file_path, as_attachment=True)
 
 
 if __name__ == "__main__":
